@@ -1,11 +1,13 @@
 from pynput import keyboard
 import threading
 import socket
+import paho.mqtt.client as mqtt
 
 
 charQueue = []
 
 def on_press(key):
+    print(key)
     try:
         #print('alphanumeric key {0} pressed'.format(key.char))
         charQueue.append(key.char)
@@ -28,7 +30,7 @@ def func1():
     
 def func2():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(('127.0.0.1', 8081))
+        s.connect(('127.0.0.1', 8091))
         while True:
             if len(charQueue) != 0:
                 charSend = charQueue.pop(0)
