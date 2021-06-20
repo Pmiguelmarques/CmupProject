@@ -1,6 +1,8 @@
 const socket = new WebSocket('ws://localhost:8080');
 
-
+socket.addEventListener('message', function(event){
+    console.log(event.data);
+})
 
 socket.addEventListener('open', function(event){
     
