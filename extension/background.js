@@ -11,11 +11,21 @@ socket.addEventListener('open', function(event){
     chrome.tabs.onActivated.addListener(tab => {
         chrome.tabs.get(tab.tabId, current_tab_info => {
             socket.send(current_tab_info.url);
+            socket.send(current_tab_info.title);
         })
 
     })
 
     chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
         socket.send(tab.url);
+        socket.send(tab.title);
     })
+})
+
+
+socket.addEventListener('close', function(event){
+    console.log("Trying to reconnect");
+    setTimeout(function() {
+        connect();
+      }, 1000);
 })
