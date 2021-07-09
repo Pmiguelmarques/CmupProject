@@ -52,6 +52,7 @@ keyMap = {'a':0,
     'Key.enter':42,
     'Key.backspace':43
     }
+
 #charMap = {'total': 0}
 charArray = np.zeros((1,44))
 totalChar = 0
@@ -77,10 +78,13 @@ def browserThread():
     asyncio.get_event_loop().run_forever()
 
 def findPattern():
+    #print(charArray)
     predicitons = nnModel.predict(x=charArray, verbose=0)
     if(predicitons[0][0]>predicitons[0][1]):
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAA")
         return "gaming"
     else:
+        print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe")
         return "clear"
     
     '''newDict = dict(sorted(charMap.items(), key=operator.itemgetter(1), reverse=True)[:4])
@@ -100,32 +104,55 @@ def inputThread():
                 if not data:
                     break
                 if data in keyMap:
+                    #print(data)
                     charArray[0][keyMap[data]] += 1
+                    #print(charArray)
                 '''if(data not in charMap):
                     charMap[data] = 1
                 else:
                     charMap[data] += 1'''
+
+def checkStatus(timeFrame):
+    status = 0
+    for i in timeFrame:
+        if i == 'gaming':
+            status += 1
+    if(status==2):
+        return True
+    return False
 
 def shutAllDown():
     print(browserSocket)
     #browserSocket.send("ola".encode("utf-8"))
 
 def decisionMaking():
+    timeFrame = []
     while True:
         charMap = {}
         totalChar = 0
-        time.sleep(60)
-        shutAllDown()
+        time.sleep(10)
+        #shutAllDown()
         if currentPage in bl:
             print("NOT WORKING!")
         else:
             if findPattern() == "gaming":
-                print("NOT WORKING!")
+                print("Not working")
             elif findPattern() == "clear":
                 print("Working")
+            charArray[0][:] = 0
+        '''    
+        else:
+            aval = findPattern()
+            print(aval)
+            timeFrame.append(aval)
+            if(checkStatus(timeFrame)):
+                print("NOT WORKING")
+            elif(len(timeFrame)==6):
+                print("Working")
+                timeFrame = []
         for i in keyMap:
             keyMap[i] = 0
-
+        '''
 nnModel = load_model('nn.h5')
 print(nnModel.summary())
 iThread = threading.Thread(target=inputThread)
