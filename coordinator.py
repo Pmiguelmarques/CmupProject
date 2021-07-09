@@ -63,7 +63,7 @@ browserSocket = set()
 # Browser specifics
 visited_pages = []
 wl = ['google', 'stackoverflow', 'github']
-currentPage = ""
+#currentPage = ""
 
 async def handler(websocket, path):
 
@@ -77,7 +77,7 @@ async def handler(websocket, path):
 
         if message != 'Connected':
 
-            currentPage = message
+            #currentPage = message
 
             if message not in visited_pages:
 
@@ -140,7 +140,7 @@ def decisionMaking():
             for page in visited_pages:
 
                 for acceptable_page in wl:
-                    if acceptable_page in page.lower():
+                    if acceptable_page.lower() in page.lower():
                         print ("The user is working based on the browser")
                         working = True
                         break

@@ -1,5 +1,5 @@
-function initialize(){
-    
+function initialize_socket(){
+
     const socket = new WebSocket('ws://localhost:8080');
 
     socket.addEventListener('message', function(event){
@@ -11,26 +11,41 @@ function initialize(){
         socket.send('Connected');
 
         chrome.tabs.onActivated.addListener(tab => {
-            chrome.tabs.get(tab.tabId, current_tab_info => {
-                socket.send(current_tab_info.url);
-                socket.send(current_tab_info.title);
-            })
+            
+            //console.log(tab.url); -> undefined
+            setTimeout(function () {
+                getCurrentTab(tab, socket);
+               }, 100);
+            
 
         })
 
         chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+            console.log("Updated on onUpdated");
             socket.send(tab.url);
             socket.send(tab.title);
         })
+
+        
     })
 
 
     socket.addEventListener('close', function(event){
         setTimeout(function() {
-            initialize();
+            initialize_socket();
         }, 60);
     })
 
 }
 
-initialize();
+initialize_socket();
+
+function getCurrentTab(tab, socket) {
+    chrome.tabs.get(tab.tabId, current_tab_info => {
+        socket.send("Updated on onActivated");
+        console.log("current tab " + current_tab_info.url);   
+        socket.send(current_tab_info.url);
+        socket.send(current_tab_info.title);
+    })
+  }
+ 
