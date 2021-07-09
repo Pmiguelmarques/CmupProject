@@ -1,21 +1,51 @@
-const socket = new WebSocket('ws://localhost:8080');
+function initialize_socket(){
 
-socket.addEventListener('message', function(event){
-    console.log(event.data);
-})
+    const socket = new WebSocket('ws://localhost:8080');
 
-socket.addEventListener('open', function(event){
-    
-    socket.send('Connected');
+    socket.addEventListener('message', function(event){
+        console.log(event.data);
+    })
 
-    chrome.tabs.onActivated.addListener(tab => {
-        chrome.tabs.get(tab.tabId, current_tab_info => {
-            socket.send(current_tab_info.url);
+    socket.addEventListener('open', function(event){
+        
+        socket.send('Connected');
+
+        chrome.tabs.onActivated.addListener(tab => {
+            
+            //console.log(tab.url); -> undefined
+            setTimeout(function () {
+                getCurrentTab(tab, socket);
+               }, 100);
+            
+
         })
 
+        chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+            console.log("Updated on onUpdated");
+            socket.send(tab.url);
+            socket.send(tab.title);
+        })
+
+        
     })
 
-    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-        socket.send(tab.url);
+
+    socket.addEventListener('close', function(event){
+        setTimeout(function() {
+            initialize_socket();
+        }, 60);
     })
-})
+
+}
+
+initialize_socket();
+
+function getCurrentTab(tab, socket) {
+    chrome.tabs.get(tab.tabId, current_tab_info => {
+        socket.send("Updated on onActivated");
+        console.log("current tab " + current_tab_info.url);   
+        socket.send(current_tab_info.url);
+        socket.send(current_tab_info.title);
+    })
+  }
+ 

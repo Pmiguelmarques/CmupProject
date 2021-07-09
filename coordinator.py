@@ -58,19 +58,31 @@ charArray = np.zeros((1,44))
 totalChar = 0
 host = '127.0.0.1'
 port = 8081
-currentPage = ""
-bl = []
 shutDown = False
 browserSocket = set()
 
+# Browser specifics
+visited_pages = []
+wl = ['google', 'stackoverflow', 'github']
+#currentPage = ""
+
 async def handler(websocket, path):
+
     browserSocket.add(websocket)
-    message = await websocket.recv()
-    print(message)
+   
     while True:
+
         message = await websocket.recv()
+
         print(message)
-        currentPage = message
+
+        if message != 'Connected':
+
+            #currentPage = message
+
+            if message not in visited_pages:
+
+                visited_pages.append(message)
 
 def browserThread():
     start_server = websockets.serve(handler, 'localhost', 8080)
@@ -126,33 +138,54 @@ def shutAllDown():
     #browserSocket.send("ola".encode("utf-8"))
 
 def decisionMaking():
+    global visited_pages
     timeFrame = []
     while True:
+
+        working = False
+
         charMap = {}
         totalChar = 0
-        time.sleep(10)
-        #shutAllDown()
-        if currentPage in bl:
-            print("NOT WORKING!")
-        else:
-            if findPattern() == "gaming":
-                print("Not working")
-            elif findPattern() == "clear":
-                print("Working")
-            charArray[0][:] = 0
-        '''    
-        else:
-            aval = findPattern()
-            print(aval)
-            timeFrame.append(aval)
-            if(checkStatus(timeFrame)):
-                print("NOT WORKING")
-            elif(len(timeFrame)==6):
-                print("Working")
-                timeFrame = []
-        for i in keyMap:
-            keyMap[i] = 0
+        time.sleep(60)
+        shutAllDown()
+
+        # Browser related decision making
+        #********************************
+        if len(visited_pages) != 0:
+            for page in visited_pages:
+
+                for acceptable_page in wl:
+                    if acceptable_page.lower() in page.lower():
+                        print ("The user is working based on the browser")
+                        working = True
+                        break
+                
+                if working:
+                    break
+        if working == False:
+            print("The user is not working based on the browser")
+        
+        visited_pages = []
+
+        #*******************************
+
+        aval = findPattern()
+        timeFrame.append(aval)
+        if checkStatus(timeFrame):
+            print("NOT WORKING")
+            timeFrame = []
+        elif len(timeFrame) == 6:
+            print("GOOD JOB")
+            timeFrame = []
         '''
+        if findPattern() == "gaming":
+            print("NOT WORKING!")
+        elif findPattern() == "clear":
+            print("Working")
+        '''
+
+        charArray[0][:] = 0
+
 nnModel = load_model('nn.h5')
 print(nnModel.summary())
 iThread = threading.Thread(target=inputThread)
