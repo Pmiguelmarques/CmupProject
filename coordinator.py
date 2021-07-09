@@ -8,7 +8,6 @@ import operator
 from tensorflow.keras.models import load_model
 import numpy as np
 from tkinter import *
-from PIL import ImageTk,Image  
 
 root = Tk()
 
@@ -57,6 +56,7 @@ keyMap = {'a':0,
     'Key.enter':42,
     'Key.backspace':43
     }
+
 #charMap = {'total': 0}
 charArray = np.zeros((1,44))
 totalChar = 0
@@ -96,10 +96,13 @@ def browserThread():
     asyncio.get_event_loop().run_forever()
 
 def findPattern():
+    #print(charArray)
     predicitons = nnModel.predict(x=charArray, verbose=0)
     if(predicitons[0][0]>predicitons[0][1]):
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAA")
         return "gaming"
     else:
+        print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe")
         return "clear"
     
     '''newDict = dict(sorted(charMap.items(), key=operator.itemgetter(1), reverse=True)[:4])
@@ -119,11 +122,22 @@ def inputThread():
                 if not data:
                     break
                 if data in keyMap:
+                    #print(data)
                     charArray[0][keyMap[data]] += 1
+                    #print(charArray)
                 '''if(data not in charMap):
                     charMap[data] = 1
                 else:
                     charMap[data] += 1'''
+
+def checkStatus(timeFrame):
+    status = 0
+    for i in timeFrame:
+        if i == 'gaming':
+            status += 1
+    if(status==2):
+        return True
+    return False
 
 def shutAllDown():
     print(browserSocket)
@@ -133,6 +147,7 @@ def decisionMaking():
     global visited_pages
     global working
 
+    timeFrame = []
     while True:
 
         charMap = {}
@@ -160,16 +175,28 @@ def decisionMaking():
 
         #*******************************
 
+        aval = findPattern()
+        timeFrame.append(aval)
+        if checkStatus(timeFrame):
+            print("NOT WORKING")
+            timeFrame = []
+            working = False
+
+        elif len(timeFrame) == 6:
+            print("GOOD JOB")
+            timeFrame = []
+            working = True
+
+        '''
         if findPattern() == "gaming":
             print("NOT WORKING!")
             working = False
 
         elif findPattern() == "clear":
             print("Working")
-            working = True
-        
-        for i in keyMap:
-            keyMap[i] = 0
+        '''
+
+        charArray[0][:] = 0
 
 class GUIBuilder(object):
     def __init__(self, root, message):
@@ -183,7 +210,7 @@ def show_popup():
 
     while True:
 
-        time.sleep(65)
+        time.sleep(365)
 
         message =""
 
