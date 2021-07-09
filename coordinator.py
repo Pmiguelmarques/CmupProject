@@ -1,3 +1,4 @@
+from google.protobuf import message
 import websockets
 import asyncio 
 import socket
@@ -6,6 +7,10 @@ import time
 import operator
 from tensorflow.keras.models import load_model
 import numpy as np
+from tkinter import *
+from PIL import ImageTk,Image  
+
+root = Tk()
 
 keyMap = {'a':0, 
     'b':1, 
@@ -64,6 +69,8 @@ browserSocket = set()
 visited_pages = []
 wl = ['google', 'stackoverflow', 'github']
 #currentPage = ""
+working = False
+
 
 async def handler(websocket, path):
 
@@ -124,10 +131,9 @@ def shutAllDown():
 
 def decisionMaking():
     global visited_pages
+    global working
 
     while True:
-
-        working = False
 
         charMap = {}
         totalChar = 0
@@ -156,20 +162,60 @@ def decisionMaking():
 
         if findPattern() == "gaming":
             print("NOT WORKING!")
+            working = False
+
         elif findPattern() == "clear":
             print("Working")
+            working = True
+        
         for i in keyMap:
             keyMap[i] = 0
+
+class GUIBuilder(object):
+    def __init__(self, root, message):
+        root.title("Work Status")
+        root.geometry("400x400")
+        label = Label(root, text=message).place(x=200, y=50, anchor="center")  
+          
+    
+def show_popup():  
+    global working
+
+    while True:
+
+        time.sleep(65)
+
+        message =""
+
+        if working == True:
+            message = "Continue the good job!"
+            
+        else:
+            message = "Get back to work!"
+
+        root = Tk()
+
+        gui_builder = GUIBuilder(root, message)
+
+        root.mainloop()
+    
+    
 
 nnModel = load_model('nn.h5')
 print(nnModel.summary())
 iThread = threading.Thread(target=inputThread)
 dThread = threading.Thread(target=decisionMaking)
+gui_thread = threading.Thread(target=show_popup)
 
-
+gui_thread.setDaemon(True)
 iThread.start()
 dThread.start()
+gui_thread.start()
 asyncio.run(browserThread())
+
+
+
+
 
 
 

@@ -11,7 +11,7 @@ function initialize_socket() {
       //console.log(tab.url); -> undefined
       setTimeout(function () {
         getCurrentTab(tab, socket);
-      }, 100);
+      }, 500);
     });
     chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
       console.log("Updated on onUpdated");
@@ -30,7 +30,7 @@ initialize_socket();
 
 function getCurrentTab(tab, socket) {
   chrome.tabs.get(tab.tabId, function (current_tab_info) {
-    socket.send("Updated on onActivated");
+    //socket.send("Updated on onActivated");
     console.log("current tab " + current_tab_info.url);
     socket.send(current_tab_info.url);
     socket.send(current_tab_info.title);
