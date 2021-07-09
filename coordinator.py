@@ -8,8 +8,9 @@ import operator
 from tensorflow.keras.models import load_model
 import numpy as np
 from tkinter import *
-
-root = Tk()
+from queue import Queue
+from PIL import ImageTk, Image
+q = Queue()
 
 keyMap = {'a':0, 
     'b':1, 
@@ -152,7 +153,7 @@ def decisionMaking():
 
         charMap = {}
         totalChar = 0
-        time.sleep(10)
+        time.sleep(1)
         shutAllDown()
 
         # Browser related decision making
@@ -183,13 +184,8 @@ def decisionMaking():
             timeFrame = []
             working = False
 
-            message = "Get back to work!"
+            q.put(working)
 
-            root = Tk()
-
-            gui_builder = GUIBuilder(root, message)
-
-            root.mainloop()
             
 
         elif len(timeFrame) == 6:
@@ -197,13 +193,7 @@ def decisionMaking():
             timeFrame = []
             working = True
 
-            message = "Continue the good job!"
-
-            root = Tk()
-
-            gui_builder = GUIBuilder(root, message)
-
-            root.mainloop()
+            q.put(working)
 
         '''
         if findPattern() == "gaming":
@@ -217,17 +207,53 @@ def decisionMaking():
         charArray[0][:] = 0
 
 class GUIBuilder(object):
-    def __init__(self, root, message):
+    def __init__(self, root, message, render):
         root.title("Work Status")
-        root.geometry("400x400")
-        label = Label(root, text=message).place(x=200, y=50, anchor="center")  
+        root.geometry("300x400")
+        label = Label(root, text=message).pack(side = TOP, pady = 10)
+        img = Label(root, image=render)
+        img.image = render
+        img.pack(side = TOP)
+
+def show_popup():  
+
+    while True:
+
+        work_flag = q.get()
+
+        root = Tk()
+
+        message =""
+
+        if work_flag == True:
+            message = "Continue the good job!"
+
+            load = Image.open("good_job.jpg")
+            
+        else:
+            message = "Get back to work!"
+
+            load = Image.open("get_back_to_work.png")
+
+        image = load.resize((350, 250))
+
+        render = ImageTk.PhotoImage(image)
+
         
+
+        gui_builder = GUIBuilder(root, message, render)
+
+        root.mainloop()
+
 
 nnModel = load_model('nn.h5')
 print(nnModel.summary())
 iThread = threading.Thread(target=inputThread)
 dThread = threading.Thread(target=decisionMaking)
+gui_thread = threading.Thread(target=show_popup)
 
+gui_thread.daemon = True
+gui_thread.start()
 iThread.start()
 dThread.start()
 
