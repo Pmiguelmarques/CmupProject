@@ -71,13 +71,22 @@ browserSocket = set()
 # Browser specifics
 visited_pages = []
 wl = ['google', 'stackoverflow', 'github']
-
+bl = []
 
 async def handler(websocket, path):
 
     browserSocket.add(websocket)
    
     while True:
+
+        # check if there are messages to be transmitted to the browser
+        if not q_messages_to_browser.empty():
+            
+            while not q_messages_to_browser.empty():
+                to_send = q_messages_to_browser.get()
+                print("to send " + to_send)
+                await websocket.send(to_send)
+                
 
         message = await websocket.recv()
 
@@ -89,11 +98,7 @@ async def handler(websocket, path):
 
                 visited_pages.append(message)
         
-        # check if there are messages to be transmitted to the browser
-
-        to_send = q_messages_to_browser.get()
-
-        await websocket.send(to_send)
+        
 
 
 def browserThread():
@@ -143,6 +148,8 @@ def shutAllDown():
 
 def decisionMaking():
     global visited_pages
+    global bl
+
     working = False
 
     timeFrame = []
@@ -150,10 +157,12 @@ def decisionMaking():
 
         charMap = {}
         totalChar = 0
-        time.sleep(1)
+        time.sleep(10)
         shutAllDown()
 
-        # Browser related decision making
+        print("Visited pages")
+        print(visited_pages)
+        # Browser related decision making and forming blacklist to be sent to the extension
         #********************************
         if len(visited_pages) != 0:
             for page in visited_pages:
@@ -162,10 +171,12 @@ def decisionMaking():
                     if acceptable_page.lower() in page.lower():
                         print ("The user is working based on the browser")
                         working = True
-                        break
-                
-                if working:
-                    break
+                    
+                    else:
+                        if page not in bl:
+                            print("Page " + page + " going to blacklist")
+                            bl.append(page)
+                        
         if working == False:
             print("The user is not working based on the browser")
         
@@ -183,7 +194,10 @@ def decisionMaking():
 
             q.put(working)
 
-            q_messages_to_browser.put("ola")
+            for not_allowed_page in bl:
+                q_messages_to_browser.put(not_allowed_page)
+            
+            bl = []
 
         elif len(timeFrame) == 6:
             print("GOOD JOB")
@@ -192,9 +206,15 @@ def decisionMaking():
 
             q.put(working)
             
-            q_messages_to_browser.put("ola")
+            for not_allowed_page in bl:
+                print("not allowed " + not_allowed_page)
+                q_messages_to_browser.put(not_allowed_page)
+            
+            bl = []
 
         charArray[0][:] = 0
+
+        
 
 class GUIBuilder(object):
     def __init__(self, root, message, render):

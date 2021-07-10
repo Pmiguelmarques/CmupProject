@@ -6,6 +6,6 @@
     "background":{
         "scripts":["./background.js"]
     },
-    "permissions": ["tabs", "activeTab", "<all_urls>"]
+    "permissions": ["tabs", "activeTab", "<all_urls>", "webRequestBlocking", "webRequest", "http://*/*", "https://*/*"]
     
 }
