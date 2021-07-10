@@ -10,6 +10,7 @@ import numpy as np
 from tkinter import *
 from queue import Queue
 from PIL import ImageTk, Image
+from tkinter.font import BOLD, Font
 
 
 keyMap = {'a':0, 
@@ -151,7 +152,7 @@ def decisionMaking():
 
         charMap = {}
         totalChar = 0
-        time.sleep(10)
+        time.sleep(1)
 
         print("Visited pages")
         print(visited_pages)
@@ -209,8 +210,9 @@ def decisionMaking():
 class GUIBuilder(object):
     def __init__(self, root, message, render):
         root.title("Work Status")
-        root.geometry("300x400")
-        label = Label(root, text=message).pack(side = TOP, pady = 10)
+        root.geometry("400x400")
+        bold20 = Font(root, size=20, weight=BOLD)
+        label = Label(root, text=message, font=bold20).pack(side = TOP, pady = 10)
         img = Label(root, image=render)
         img.image = render
         img.pack(side = TOP)
@@ -225,6 +227,8 @@ def show_popup():
 
         message =""
 
+        #work_flag = True
+
         if work_flag == True:
             message = "Continue the good job!"
 
@@ -233,9 +237,10 @@ def show_popup():
         else:
             message = "Get back to work!"
 
-            load = Image.open("get_back_to_work.png")
+            load = Image.open("warning_sign.jpg")
 
-        image = load.resize((350, 250))
+
+        image = load.resize((250, 250))
 
         render = ImageTk.PhotoImage(image)
 

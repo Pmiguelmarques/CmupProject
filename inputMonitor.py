@@ -1,7 +1,7 @@
 from pynput import keyboard
 import threading
 import socket
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
 
 
 charQueue = []
