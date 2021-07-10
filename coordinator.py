@@ -12,6 +12,8 @@ from queue import Queue
 from PIL import ImageTk, Image
 q = Queue()
 
+q_messages_to_browser = Queue()
+
 keyMap = {'a':0, 
     'b':1, 
     'c':2, 
@@ -69,8 +71,6 @@ browserSocket = set()
 # Browser specifics
 visited_pages = []
 wl = ['google', 'stackoverflow', 'github']
-#currentPage = ""
-working = False
 
 
 async def handler(websocket, path):
@@ -85,11 +85,16 @@ async def handler(websocket, path):
 
         if message != 'Connected':
 
-            #currentPage = message
-
             if message not in visited_pages:
 
                 visited_pages.append(message)
+        
+        # check if there are messages to be transmitted to the browser
+
+        to_send = q_messages_to_browser.get()
+
+        await websocket.send(to_send)
+
 
 def browserThread():
     start_server = websockets.serve(handler, 'localhost', 8080)
@@ -106,11 +111,6 @@ def findPattern():
         print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEe")
         return "clear"
     
-    '''newDict = dict(sorted(charMap.items(), key=operator.itemgetter(1), reverse=True)[:4])
-    print(list(newDict.keys()))
-    if all(item in ['w','s','d','a','Key.up', 'Key.down', 'Key.left', 'Key.right'] for item in list(newDict.keys())):
-        return "gaming"
-    return "clear"'''
 
 def inputThread():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -126,10 +126,6 @@ def inputThread():
                     #print(data)
                     charArray[0][keyMap[data]] += 1
                     #print(charArray)
-                '''if(data not in charMap):
-                    charMap[data] = 1
-                else:
-                    charMap[data] += 1'''
 
 def checkStatus(timeFrame):
     status = 0
@@ -144,9 +140,10 @@ def shutAllDown():
     print(browserSocket)
     #browserSocket.send("ola".encode("utf-8"))
 
+
 def decisionMaking():
     global visited_pages
-    global working
+    working = False
 
     timeFrame = []
     while True:
@@ -186,7 +183,7 @@ def decisionMaking():
 
             q.put(working)
 
-            
+            q_messages_to_browser.put("ola")
 
         elif len(timeFrame) == 6:
             print("GOOD JOB")
@@ -194,15 +191,8 @@ def decisionMaking():
             working = True
 
             q.put(working)
-
-        '''
-        if findPattern() == "gaming":
-            print("NOT WORKING!")
-            working = False
-
-        elif findPattern() == "clear":
-            print("Working")
-        '''
+            
+            q_messages_to_browser.put("ola")
 
         charArray[0][:] = 0
 
@@ -229,7 +219,7 @@ def show_popup():
             message = "Continue the good job!"
 
             load = Image.open("good_job.jpg")
-            
+
         else:
             message = "Get back to work!"
 
@@ -238,8 +228,6 @@ def show_popup():
         image = load.resize((350, 250))
 
         render = ImageTk.PhotoImage(image)
-
-        
 
         gui_builder = GUIBuilder(root, message, render)
 
@@ -256,6 +244,7 @@ gui_thread.daemon = True
 gui_thread.start()
 iThread.start()
 dThread.start()
+
 
 asyncio.run(browserThread())
 
