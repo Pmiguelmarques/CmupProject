@@ -6,6 +6,9 @@
     "background":{
         "scripts":["./background.js"]
     },
+    "web_accessible_resources": [
+        "blocked_page.html"
+     ],
     "permissions": ["tabs", "activeTab", "<all_urls>", "webRequestBlocking", "webRequest", "http://*/*", "https://*/*"]
     
 }

@@ -13,8 +13,7 @@ function initialize_socket(not_allowed_urls) {
 
     for (var i = 0; i < not_allowed_urls.length; i++) {
       console.log("Array NAU -> " + not_allowed_urls[i]);
-    } //updateFilters(not_allowed_urls);
-
+    }
   });
   socket.addEventListener('open', function (event) {
     socket.send('Connected');
@@ -53,3 +52,24 @@ function getCurrentTab(tab, socket, not_allowed_urls) {
     }
   });
 }
+
+function getNewRequest(request) {
+  if (request && request.url) {
+    if (request.type == "main_frame" || request.type == "sub_frame") {
+      for (var i = 0; i < not_allowed_urls.length; i++) {
+        console.log("Array NAU -> " + not_allowed_urls[i]);
+
+        if (request.url.indexOf(not_allowed_urls[i]) > -1) {
+          URLStorage = request.url;
+          return {
+            redirectUrl: chrome.extension.getURL("blocked_page.html")
+          };
+        }
+      }
+    }
+  }
+}
+
+chrome.webRequest.onBeforeRequest.addListener(getNewRequest, {
+  urls: ["*://*/*"]
+}, ['blocking']);
