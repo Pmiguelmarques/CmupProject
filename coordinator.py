@@ -10,9 +10,7 @@ import numpy as np
 from tkinter import *
 from queue import Queue
 from PIL import ImageTk, Image
-q = Queue()
 
-q_messages_to_browser = Queue()
 
 keyMap = {'a':0, 
     'b':1, 
@@ -68,7 +66,9 @@ port = 8081
 shutDown = False
 browserSocket = set()
 
-# Browser specifics
+# Browser and popup specifics
+q = Queue()
+q_messages_to_browser = Queue()
 visited_pages = []
 wl = ['google', 'stackoverflow', 'github']
 bl = []
@@ -99,8 +99,6 @@ async def handler(websocket, path):
                 visited_pages.append(message)
         
         
-
-
 def browserThread():
     start_server = websockets.serve(handler, 'localhost', 8080)
     asyncio.get_event_loop().run_until_complete(start_server)
@@ -141,10 +139,6 @@ def checkStatus(timeFrame):
         return True
     return False
 
-def shutAllDown():
-    print(browserSocket)
-    #browserSocket.send("ola".encode("utf-8"))
-
 
 def decisionMaking():
     global visited_pages
@@ -158,28 +152,24 @@ def decisionMaking():
         charMap = {}
         totalChar = 0
         time.sleep(10)
-        shutAllDown()
 
         print("Visited pages")
         print(visited_pages)
-        # Browser related decision making and forming blacklist to be sent to the extension
+
+        # Browser forming blacklist to be sent to the extension
         #********************************
+
         if len(visited_pages) != 0:
             for page in visited_pages:
 
                 for acceptable_page in wl:
-                    if acceptable_page.lower() in page.lower():
-                        print ("The user is working based on the browser")
-                        working = True
-                    
-                    else:
+
+                    if acceptable_page.lower() not in page.lower():
+                        
                         if page not in bl:
                             print("Page " + page + " going to blacklist")
                             bl.append(page)
                         
-        if working == False:
-            print("The user is not working based on the browser")
-        
         visited_pages = []
 
         #*******************************
