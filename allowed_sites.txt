@@ -1,0 +1,10 @@
+google
+github
+stackoverflow
+reddit
+quora
+gitlab
+slack
+bitbucket
+trello
+gmail

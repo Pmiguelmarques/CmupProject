@@ -1,3 +1,4 @@
+from typing import Tuple
 from google.protobuf import message
 import websockets
 import asyncio 
@@ -71,8 +72,9 @@ browserSocket = set()
 q = Queue()
 q_messages_to_browser = Queue()
 visited_pages = []
-wl = ['google', 'stackoverflow', 'github']
+wl = []
 bl = []
+initialization = True
 
 async def handler(websocket, path):
 
@@ -80,7 +82,7 @@ async def handler(websocket, path):
    
     while True:
 
-        # check if there are messages to be transmitted to the browser
+        # check if there are messages to be transmitted to the browser, that is, the urls in the blacklist
         if not q_messages_to_browser.empty():
             
             while not q_messages_to_browser.empty():
@@ -142,17 +144,35 @@ def checkStatus(timeFrame):
 
 
 def decisionMaking():
+
     global visited_pages
+    global wl
     global bl
+    global initialization
+
+    # Read the allowed sites from the corresponding file
+
+    if initialization:
+
+        print("Reading file with the allowed sites")
+        f = open("allowed_sites.txt", "r")
+        for line in f:
+            wl.append(line.strip())
+        
+        initialization = False
+
+    print("Allowed websites")
+    print(wl)
 
     working = False
 
     timeFrame = []
+
     while True:
 
         charMap = {}
         totalChar = 0
-        time.sleep(10)
+        time.sleep(60)
 
         print("Visited pages")
         print(visited_pages)
