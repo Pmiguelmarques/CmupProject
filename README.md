@@ -1,6 +1,6 @@
 # PerSpy
 
-PerSpy is an application that is directed to capture the movements of the user, directed for software development, offering also an extension that blocks the potentially distracting websites.
+PerSpy is an application that is captures the movements of the user, directed for software development, offering also an extension that blocks the potentially distracting websites.
 
 ## Installation
 
