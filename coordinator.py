@@ -152,7 +152,7 @@ def decisionMaking():
 
         charMap = {}
         totalChar = 0
-        time.sleep(1)
+        time.sleep(10)
 
         print("Visited pages")
         print(visited_pages)
@@ -161,15 +161,23 @@ def decisionMaking():
         #********************************
 
         if len(visited_pages) != 0:
+
             for page in visited_pages:
+                
+                accepted = False
 
                 for acceptable_page in wl:
 
-                    if acceptable_page.lower() not in page.lower():
+                    if acceptable_page.lower() in str(page).lower():
                         
-                        if page not in bl:
-                            print("Page " + page + " going to blacklist")
-                            bl.append(page)
+                            accepted = True
+
+                if not accepted:
+
+                    if page not in bl:
+
+                        bl.append(page)           
+                        
                         
         visited_pages = []
 
