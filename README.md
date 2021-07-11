@@ -9,12 +9,12 @@ $ python --version
 3.9.6
 ```
 
-### Create a virtual environment ###
+### Create a virtual environment (Windows) ###
 
 ```bash
-$ python -m venv env
+$ virtualenv env
 
-$ source env/bin/activate
+$ .\env\Scripts\activate
 ```
 
 ### Install the packages ### 
