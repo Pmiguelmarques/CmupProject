@@ -28,7 +28,7 @@ $ pip install -r requirements.txt
 
 The extension is only suported in Chrome.
 To load the extension in the browser:
-- Got to Chrome Extensions Page, in chrome://extensions
+- Go to Chrome Extensions Page, in chrome://extensions
 - Enable developer mode
 - Click in Load unpacked extension and select the folder of the extension.
 - The extension should be added and it should be running by now.
